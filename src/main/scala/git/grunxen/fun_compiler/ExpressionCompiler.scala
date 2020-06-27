@@ -10,10 +10,12 @@ import scala.util.Try
 
 object ExpressionCompiler {
 
+  val methodName = "apply"
+
   def compile(expr: FunctionDecl): Try[ClassNode] = {
     Try {
       val cls = prepareClass
-      val fun = cls.visitMethod(ACC_PUBLIC + ACC_STATIC, "fun", descriptor(expr.args.length), null, null)
+      val fun = cls.visitMethod(ACC_PUBLIC + ACC_STATIC, methodName, descriptor(expr.args.length), null, null)
       generateMethod(expr, fun)
       cls
     }
@@ -23,7 +25,7 @@ object ExpressionCompiler {
 
   private def prepareClass: ClassNode = {
     val cls = new ClassNode()
-    cls.name = "git/grunxen/math_compiler/ExpressionEvaluator$" + UUID.randomUUID().toString.replace("-", "")
+    cls.name = "git/grunxen/math_compiler/ExpressionFunction$" + UUID.randomUUID().toString.replace("-", "")
     cls.superName = "java/lang/Object"
     cls.access = ACC_PUBLIC + ACC_FINAL
     cls.version = V1_8
