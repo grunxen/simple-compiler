@@ -23,11 +23,19 @@ object ExpressionCompiler {
   }
 
   private def generateMethod(expr: Expr, m: MethodVisitor): MethodVisitor = {
+    visitExpr(expr, m)
+    m.visitInsn(IRETURN)
+    m
+  }
+
+  private def visitExpr(expr: Expr, m: MethodVisitor) {
     expr match {
       case Number(i) =>
         m.visitLdcInsn(i)
-        m.visitInsn(IRETURN)
+      case Add(expr1, expr2) =>
+        visitExpr(expr1, m)
+        visitExpr(expr2, m)
+        m.visitInsn(IADD)
     }
-    m
   }
 }
