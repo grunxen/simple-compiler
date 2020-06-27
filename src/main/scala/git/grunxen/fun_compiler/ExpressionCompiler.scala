@@ -39,22 +39,16 @@ object ExpressionCompiler {
         m.visitLdcInsn(i)
       case Argument(c) =>
         m.visitVarInsn(ILOAD, argsIndx(c))
-      case Add(expr1, expr2) =>
-        visitExpr(expr1, m, argsIndx)
-        visitExpr(expr2, m, argsIndx)
-        m.visitInsn(IADD)
-      case Sub(expr1, expr2) =>
-        visitExpr(expr1, m, argsIndx)
-        visitExpr(expr2, m, argsIndx)
-        m.visitInsn(ISUB)
-      case Mul(expr1, expr2) =>
-        visitExpr(expr1, m, argsIndx)
-        visitExpr(expr2, m, argsIndx)
-        m.visitInsn(IMUL)
-      case Div(expr1, expr2) =>
-        visitExpr(expr1, m, argsIndx)
-        visitExpr(expr2, m, argsIndx)
-        m.visitInsn(IDIV)
+      case op: Operator =>
+        visitExpr(op.expr1, m, argsIndx)
+        visitExpr(op.expr2, m, argsIndx)
+        val instr = op match {
+          case _: Add => IADD
+          case _: Sub => ISUB
+          case _: Mul => IMUL
+          case _: Div => IDIV
+        }
+        m.visitInsn(instr)
     }
   }
 }
