@@ -34,8 +34,10 @@ object ExpressionCompiler {
 
   private def generateMethod(expr: FunctionDecl, m: MethodVisitor): MethodVisitor = {
     val argsIndx = expr.args.zipWithIndex.toMap
+    m.visitCode()
     visitExpr(expr.expr, m, argsIndx)
     m.visitInsn(IRETURN)
+    m.visitEnd()
     m
   }
 
