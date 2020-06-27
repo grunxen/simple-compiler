@@ -43,6 +43,18 @@ object ExpressionCompiler {
         visitExpr(expr1, m, argsIndx)
         visitExpr(expr2, m, argsIndx)
         m.visitInsn(IADD)
+      case Sub(expr1, expr2) =>
+        visitExpr(expr1, m, argsIndx)
+        visitExpr(expr2, m, argsIndx)
+        m.visitInsn(ISUB)
+      case Mul(expr1, expr2) =>
+        visitExpr(expr1, m, argsIndx)
+        visitExpr(expr2, m, argsIndx)
+        m.visitInsn(IMUL)
+      case Div(expr1, expr2) =>
+        visitExpr(expr1, m, argsIndx)
+        visitExpr(expr2, m, argsIndx)
+        m.visitInsn(IDIV)
     }
   }
 }

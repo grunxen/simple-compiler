@@ -27,11 +27,18 @@ class ExpressionCompilerTest extends AnyFunSuite {
     assert(o.contains(200))
   }
 
-  test("Function with argument compiles and executes successfully") {
+  test("Simple function with argument compiles and executes successfully") {
     val o = compileAndExecute(FunctionDecl(List('x'), Argument('x')), List(200))
     assert(o.contains(200))
 
     val a = compileAndExecute(FunctionDecl(List('x'), Add(Argument('x'), Number(255))), List(200))
     assert(a.contains(455))
+  }
+
+  test("Function with argument compiles and executes successfully") {
+    // (x+1)*2+y
+    val add = Add(Mul(Add(Argument('x'), Number(1)), Number(2)), Argument('y'))
+    val o = compileAndExecute(FunctionDecl(List('x', 'y'), add), List(5, 8))
+    assert(o.contains(20))
   }
 }
