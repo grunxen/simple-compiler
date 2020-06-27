@@ -6,13 +6,17 @@ import org.objectweb.asm.Opcodes._
 import org.objectweb.asm.MethodVisitor
 import org.objectweb.asm.tree._
 
+import scala.util.Try
+
 object ExpressionCompiler {
 
-  def compile(expr: FunctionDecl): ClassNode = {
-    val cls = prepareClass
-    val fun = cls.visitMethod(ACC_PUBLIC + ACC_STATIC, "fun", descriptor(expr.args.length), null, null)
-    generateMethod(expr, fun)
-    cls
+  def compile(expr: FunctionDecl): Try[ClassNode] = {
+    Try {
+      val cls = prepareClass
+      val fun = cls.visitMethod(ACC_PUBLIC + ACC_STATIC, "fun", descriptor(expr.args.length), null, null)
+      generateMethod(expr, fun)
+      cls
+    }
   }
 
   private def descriptor(count: Int) = "(" + ("I" * count) + ")I"

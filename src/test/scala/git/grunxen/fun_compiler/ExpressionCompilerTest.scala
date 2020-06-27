@@ -1,11 +1,15 @@
 package git.grunxen.fun_compiler
 
+import java.util.NoSuchElementException
+
 import org.scalatest.funsuite.AnyFunSuite
+
+import scala.util.Failure
 
 class ExpressionCompilerTest extends AnyFunSuite {
   def compileAndExecute(f: FunctionDecl, args: List[Int] = Nil): Option[Any] = {
     val cls = ExpressionCompiler.compile(f)
-    ClassExecutor.exec(cls, "fun", args)
+    ClassExecutor.exec(cls.get, "fun", args)
   }
 
   def compileOnlyExpr(e: Expr): Option[Any] = {
@@ -40,5 +44,10 @@ class ExpressionCompilerTest extends AnyFunSuite {
     val add = Add(Mul(Add(Argument('x'), Number(1)), Number(2)), Argument('y'))
     val o = compileAndExecute(FunctionDecl(List('x', 'y'), add), List(5, 8))
     assert(o.contains(20))
+  }
+
+  test("Function compilation fails if argument not defined") {
+    val f = ExpressionCompiler.compile(FunctionDecl(List(), Argument('x')))
+    assert(f.isFailure)
   }
 }
