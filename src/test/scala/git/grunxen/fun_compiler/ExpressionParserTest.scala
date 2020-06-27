@@ -23,14 +23,14 @@ class ExpressionParserTest extends AnyFunSuite {
 
   test("Expression parser should properly parse function signature") {
     val parser = new FunctionParser("fun(x,y)")
-    assert(parser.Signature.run() == Success(Set('x', 'y')))
+    assert(parser.Signature.run() == Success(List('x', 'y')))
 
     val parser2 = new FunctionParser("fun()")
-    assert(parser2.Signature.run() == Success(Set()))
+    assert(parser2.Signature.run() == Success(List()))
   }
 
   test("Expression parser should properly parse function declaration") {
     val parser = new FunctionParser("fun(x)=1")
-    assert(parser.RFunction.run() == Success(FunctionDecl(Set('x'), Number(1))))
+    assert(parser.RFunction.run() == Success(FunctionDecl(List('x'), Number(1))))
   }
 }

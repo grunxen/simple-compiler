@@ -4,11 +4,11 @@ import org.parboiled2._
 
 class FunctionParser(val input: ParserInput) extends Parser {
 
-  def RFunction: Rule1[FunctionDecl] = rule { Signature ~ ch('=') ~ Operation ~ EOI ~> ((s: Set[Char], e: Expr) => FunctionDecl(s, e))}
+  def RFunction: Rule1[FunctionDecl] = rule { Signature ~ ch('=') ~ Operation ~ EOI ~> ((s: List[Char], e: Expr) => FunctionDecl(s, e))}
 
-  def Signature: Rule1[Set[Char]] = rule { str("fun(") ~ optional(Arguments) ~ str(")") ~> ((o: Option[Set[Char]]) => o.getOrElse(Set())) }
+  def Signature: Rule1[List[Char]] = rule { str("fun(") ~ optional(Arguments) ~ str(")") ~> ((o: Option[List[Char]]) => o.getOrElse(List())) }
 
-  def Arguments: Rule1[Set[Char]] = rule { zeroOrMore(StartArgs) ~ Arg ~> ((args: Seq[Char], c: Char) => Set.from(args :+ c)) }
+  def Arguments: Rule1[List[Char]] = rule { zeroOrMore(StartArgs) ~ Arg ~> ((args: Seq[Char], c: Char) => List.from(args :+ c)) }
   def StartArgs: Rule1[Char] = rule { Arg ~ ch(',') }
   def Arg: Rule1[Char] = rule { capture(CharPredicate.LowerAlpha) ~> ((s: String) => s.charAt(0)) }
 
