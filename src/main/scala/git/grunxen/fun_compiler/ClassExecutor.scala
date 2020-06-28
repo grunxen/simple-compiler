@@ -11,10 +11,7 @@ object ClassExecutor {
 
   def getFunction(c: ClassNode): Either[Throwable, ExpressionFunction] = Try {
     val value = loader.loadGeneratedClass(c)
-    val fun = value.getDeclaredMethods.find(_.getName == ExpressionCompiler.methodName).get
-    new ExpressionFunction {
-      override def apply(args: Int*): Int = fun.invoke(null, args: _*).asInstanceOf[Int]
-    }
+    value.getDeclaredConstructor().newInstance()
   }.toEither
 
   def exec(c: ClassNode, args: Int*): Either[Throwable, Int]  =
@@ -22,10 +19,11 @@ object ClassExecutor {
 }
 
 private class FunctionClassLoader extends ClassLoader {
-  def loadGeneratedClass(c: ClassNode): Class[_] = {
+  def loadGeneratedClass(c: ClassNode): Class[_ <: ExpressionFunction] = {
     val writer = new ClassWriter(ClassWriter.COMPUTE_FRAMES + ClassWriter.COMPUTE_MAXS)
     c.accept(writer)
     val bytes = writer.toByteArray
-    defineClass(null, bytes, 0, bytes.length)
+    val clazz = defineClass(null, bytes, 0, bytes.length)
+    clazz.asInstanceOf[Class[_ <: ExpressionFunction]]
   }
 }
