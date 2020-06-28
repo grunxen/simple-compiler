@@ -29,7 +29,18 @@ object ExpressionCompiler {
     cls.superName = "java/lang/Object"
     cls.access = ACC_PUBLIC + ACC_FINAL
     cls.version = V1_8
+    defaultConstructor(cls)
     cls
+  }
+
+  private def defaultConstructor(cls: ClassNode): MethodVisitor = {
+    val method = cls.visitMethod(ACC_PUBLIC, "<init>", "()V", null, null)
+    method.visitCode()
+    method.visitVarInsn(ALOAD, 0)
+    method.visitMethodInsn(INVOKESPECIAL, "java/lang/Object", "<init>", "()V", false)
+    method.visitInsn(RETURN)
+    method.visitMaxs(1, 1)
+    method
   }
 
   private def generateMethod(expr: FunctionDecl, m: MethodVisitor): MethodVisitor = {
