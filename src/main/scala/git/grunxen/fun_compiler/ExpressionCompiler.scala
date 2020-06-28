@@ -24,13 +24,14 @@ object ExpressionCompiler {
 
   private def prepareClass: ClassNode = {
     import scala.jdk.CollectionConverters._
+    import CompilerHelper._
 
     val cls = new ClassNode()
     cls.name = "git/grunxen/math_compiler/ExpressionFunctionImpl$" + UUID.randomUUID().toString.replace("-", "")
     cls.superName = "java/lang/Object"
     cls.access = ACC_PUBLIC + ACC_FINAL
     cls.version = V1_8
-    cls.interfaces = List(classOf[ExpressionFunction].getCanonicalName.replace('.', '/')).asJava
+    cls.interfaces = List(classOf[ExpressionFunction].jvmName).asJava
     defaultConstructor(cls)
     cls
   }
