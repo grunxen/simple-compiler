@@ -10,25 +10,27 @@ import scala.util.Try
 
 object ExpressionCompiler {
 
-  val methodName = "apply"
+  private val descriptor = "(Lscala/collection/immutable/Seq;)I"
 
   def compile(expr: FunctionDecl): Try[ClassNode] = {
     Try {
       val cls = prepareClass
-      val fun = cls.visitMethod(ACC_PUBLIC + ACC_STATIC, methodName, descriptor(expr.args.length), null, null)
+      val fun = cls.visitMethod(ACC_PUBLIC, "apply", descriptor, null, null)
       generateMethod(expr, fun)
       cls
     }
   }
 
-  private def descriptor(count: Int) = "(" + ("I" * count) + ")I"
 
   private def prepareClass: ClassNode = {
+    import scala.jdk.CollectionConverters._
+
     val cls = new ClassNode()
-    cls.name = "git/grunxen/math_compiler/ExpressionFunction$" + UUID.randomUUID().toString.replace("-", "")
+    cls.name = "git/grunxen/math_compiler/ExpressionFunctionImpl$" + UUID.randomUUID().toString.replace("-", "")
     cls.superName = "java/lang/Object"
     cls.access = ACC_PUBLIC + ACC_FINAL
     cls.version = V1_8
+    cls.interfaces = List(classOf[ExpressionFunction].getCanonicalName.replace('.', '/')).asJava
     defaultConstructor(cls)
     cls
   }
@@ -57,7 +59,17 @@ object ExpressionCompiler {
       case Number(i) =>
         m.visitLdcInsn(i)
       case Argument(c) =>
-        m.visitVarInsn(ILOAD, argsIndx(c))
+        // java uses arrays for varargs implementation, scala uses Seq[T]
+
+        // load Seq[Int] on the stack
+        // this has index 0, Seq[Int] has index 1
+        m.visitVarInsn(ALOAD, 1)
+        // load index of variable
+        m.visitLdcInsn(argsIndx(c))
+        // invoke apply method
+        m.visitMethodInsn(INVOKEINTERFACE, "scala/collection/immutable/Seq", "apply", "(I)Ljava/lang/Object;", true)
+        // unbox variable
+        m.visitMethodInsn(INVOKESTATIC, "scala/runtime/BoxesRunTime", "unboxToInt", "(Ljava/lang/Object;)I", false)
       case op: Operator =>
         visitExpr(op.expr1, m, argsIndx)
         visitExpr(op.expr2, m, argsIndx)
